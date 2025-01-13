@@ -9,9 +9,12 @@ struct
   module State = struct
     type 'a t = S.t -> 'a * S.t
 
-    let return a = failwith "NYI"
-    let bind m f = failwith "NYI"
-  end
+    let return a = (fun x -> a, x)
+    let bind m f = fun s ->
+      let (a : 'a), (s = m s in
+      let sb = f a in
+      fun 
+  end (* Pierre-Marie Pédrot / *)
 
   module M = Monad.Expand (State)
   include M

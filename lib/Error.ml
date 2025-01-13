@@ -23,6 +23,3 @@ let try_with_finally m f fe = match m with
 let run = function
   | OK a -> a
   | Err e -> raise e
-
-let ( let* ) = bind
-let ( >>= ) = bind

@@ -3,6 +3,8 @@
 [@@@warning "-20-27-32-37-39"]
 [@@@warning "-38"]
 
+open Monads
+
 type value = IsNat of int | IsBool of bool
 
 type exp =
@@ -13,10 +15,41 @@ type exp =
 
 exception IllTyped
 
-let ( let* ) _ _ = failwith "NYI: bring me in scope!"
-let return _ = failwith "NYI: bring me in scope!"
-let run _ = failwith "NYI: bring me in scope!"
-let rec sem e = failwith "NYI"
+
+let ( let* ) = Error.(let*)
+let return = Error.return
+let run = Error.run
+let err = Error.err IllTyped
+let rec sem e : value Error.t = match e with
+  | Val x -> return x
+  | Eq (x, y) ->
+      let* x = sem x in
+      let* y = sem y in
+      begin match x, y with
+      | IsNat i1, IsNat i2 -> IsBool (i1 = i2) |> return
+      | IsBool b1, IsBool b2 -> IsBool (b1 = b2) |> return
+      | _ -> IsBool false |> return
+      end
+  | Plus (n, m) ->
+      let* n = sem n in
+      let* m = sem m in
+      begin match n, m with
+      | IsNat n, IsNat m -> IsNat (n+m) |> return
+      | _ -> err
+      end
+  | Ifte (b, x, y) ->
+      let* b = sem b in
+      let* x = sem x in
+      let* y = sem y in
+      begin match b with
+       |IsBool b ->
+        begin match (x, y) with
+          | IsBool x, IsBool y -> IsBool (if b then x else y) |> return
+          | IsNat x, IsNat y -> IsNat (if b then x else y) |> return
+          | _ -> err
+        end
+       |_ -> err
+      end
 
 (** * Tests *)
 

@@ -5,14 +5,24 @@
 module Base = struct
   type 'a t = OK of 'a | Err of exn
 
-  let return a = failwith "NYI"
-  let bind m f = failwith "NYI"
+  let return a = OK a
+  let bind (m : 'a t) (f : 'a -> 'b t) = match m with
+    | OK a -> f a
+    | Err e -> Err e
 end
 
 module M = Monad.Expand (Base)
 include M
 open Base
 
-let err e = failwith "NYI"
-let try_with_finally m ks kf = failwith "NYI"
-let run m = failwith "NYI"
+let err e = Err e
+let try_with_finally m f fe = match m with
+  | OK a -> f a
+  | Err e -> fe e
+
+let run = function
+  | OK a -> a
+  | Err e -> raise e
+
+let ( let* ) = bind
+let ( >>= ) = bind

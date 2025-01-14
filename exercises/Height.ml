@@ -20,7 +20,7 @@ let make_list =
 
 let%test _ =
   (* Note: [height] is not tail-rec *)
-  let res = try height (make_list 100000000) with _ -> -1 in
+  let res = try height (make_list 50000000) with _ -> -1 in
   res = -1
 
 module M = Continuation.Make (struct
@@ -29,11 +29,16 @@ end)
 
 open M
 
-let hcpsaux _ = failwith "NYI"
+let rec hcpsaux t = match t with
+  | E -> return 0
+  | N (t, t') ->
+     let* n = hcpsaux t in
+     let* m = hcpsaux t' in
+     return (1 + max n m)
 let hcps t = run (hcpsaux t)
 let%test _ = hcps E = 0
 let%test _ = hcps (N (E, E)) = 1
 let%test _ = hcps (make_list 100) = 100
 let%test _ = hcps (make_list 10000) = 10000
 let%test _ = hcps (make_list 1000000) = 1000000
-(* let%test _ = hcps (make_list 100000000) = 100000000 *)
+let%test _ = hcps (make_list 50000000) = 50000000

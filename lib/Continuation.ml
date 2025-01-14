@@ -9,15 +9,17 @@ struct
   module Base = struct
     type 'a t = ('a -> Ans.t) -> Ans.t
 
-    let return a = failwith "NYI"
-    let bind m f = failwith "NYI"
+    let return a = fun f -> f a
+    let bind (m : ('a -> Ans.t) -> Ans.t) (f : 'a -> 'b t) =
+     fun (fb : 'b -> Ans.t) ->
+       m (fun (a:'a) -> (f a) fb)
   end
 
   module M = Monad.Expand (Base)
   include M
 
-  let callcc f = failwith "NYI"
-  let throw m k' = failwith "NYI"
+  let callcc f (c : ('a -> Ans.t)) : Ans.t = (f c) c
+  let throw m k' = (fun k -> m k')
   let tfix mrec a = failwith "NYI"
-  let run m = failwith "NYI"
+  let run m = m (fun x -> x)
 end

@@ -14,10 +14,19 @@ open Monads
  * nothing otherwise.
  *)
 
-let ( let* ) _ _ = failwith "NYI: bring me in scope!"
-let return _ = failwith "NYI: bring me in scope!"
-let run _ = failwith "NYI: bring me in scope!"
-let play_game _ = failwith "NYI"
+module GameState = State.Make(struct type t = (bool * int) end)
+open GameState
+let rec play_game s (active, count) =
+  let open String in
+  let split_s s = get s 0, if length s = 1 then "" else sub s 1 (length s - 1)
+  if length s = 0 then "", (active, count) else
+  let (c, s) = split s in play_game s
+  begin match get s 0 with
+  | 'c' -> (not active, count)
+  | 'a' -> (active, count+1)
+  | 'b' -> (active, count-1)
+  | _ -> assert false
+  end
 let result s = run (play_game s) (false, 0)
 
 let result2 s1 s2 =

@@ -10,16 +10,16 @@ struct
     type 'a t = S.t -> 'a * S.t
 
     let return a = (fun x -> a, x)
-    let bind m f = fun s ->
-      let (a : 'a), (s = m s in
-      let sb = f a in
-      fun 
-  end (* Pierre-Marie Pédrot / *)
+    let bind m f = fun (s : S.t) ->
+      let (a : 'a), (s : S.t) = m s in
+      let mb : 'b t = f a in
+      mb s
+  end
 
   module M = Monad.Expand (State)
   include M
 
-  let get () s = failwith "NYI"
-  let set x _ = failwith "NYI"
-  let run m = failwith "NYI"
+  let get () s = (s, s)
+  let set x _ = ((), x)
+  let run m s = m s |> fst
 end

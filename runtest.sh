@@ -2,7 +2,7 @@
 
 FILENAME=$1
 
-dune runtest &>/dev/null
+dune build exercises/.exercises.inline-tests/inline_test_runner_exercises.exe
 
 echo "Selectively run tests for $FILENAME"
 ./_build/default/exercises/.exercises.inline-tests/inline_test_runner_exercises.exe \

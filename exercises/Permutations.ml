@@ -7,8 +7,8 @@ open Monads.Nondeterminism
 let rec insert x l = match l with
   | [] -> return [x]
   | hd::tl ->
-     let* b = insert x tl in
-     either (return (x::l)) (return (hd::b))
+     either (return (x::l))
+     (let* b = insert x tl in (return (hd::b)))
 
 let rec permut l = match l with
   | [] -> return []

@@ -13,4 +13,15 @@ end)
 
 open M
 
-let exfalso () = failwith "NYI"
+
+
+(*
+  I have a hard time understanting/intuiting continuations/callcc
+  The thing I did get is that the Continuation monad's underlying
+  functor (instantiated with bot) sends a type to its double
+  negation translation. I only used this intuition to prove
+  the double negation of the excluded middle.
+*)
+let exfalso () =
+  fun (f : ('a, 'a not) result -> bot) ->
+    f (Error (fun (a : 'a) -> f (Ok a)))

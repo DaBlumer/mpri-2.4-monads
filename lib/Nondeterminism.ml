@@ -5,14 +5,14 @@
 module Base = struct
   type 'a t = 'a list
 
-  let return a = failwith "NYI"
-  let bind m f = failwith "NYI"
+  let return a = [a]
+  let bind m f = List.concat_map f m
 end
 
 module M = Monad.Expand (Base)
 include M
 
-let fail () = failwith "NYI"
-let either a b = failwith "NYI"
-let run m = failwith "NYI"
-let all m = failwith "NYI"
+let fail () = []
+let either a b = a @ b
+let run = List.hd
+let all = List.to_seq

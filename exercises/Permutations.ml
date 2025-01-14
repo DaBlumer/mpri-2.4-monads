@@ -4,8 +4,18 @@
 
 open Monads.Nondeterminism
 
-let rec insert x l = failwith "NYI"
-let rec permut l = failwith "NYI"
+let rec insert x l = match l with
+  | [] -> return [x]
+  | hd::tl ->
+     let* b = insert x tl in
+     either (return (x::l)) (return (hd::b))
+
+let rec permut l = match l with
+  | [] -> return []
+  | hd::tl ->
+     let* tl = permut tl in
+     insert hd tl
+
 let%test _ = List.of_seq (all (permut [])) = [ [] ]
 let%test _ = List.of_seq (all (permut [ 1 ])) = [ [ 1 ] ]
 

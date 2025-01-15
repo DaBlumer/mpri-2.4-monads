@@ -11,15 +11,19 @@ module Make (Env : sig
 end) =
 struct
   (* Use the Update monad to instantiate the following definitions *)
+  module M = struct
+    type t = Env.t list
+    let empty = []
+    let (<+>) = List.append
+  end
 
-  type 'a t = |
+  module UnitS = struct
+    type t = unit
+    type m = M.t
+    let act _ _ = ()
+  end
 
+  module Reader = Update.Make (M) (UnitS)
+  include Reader
   (* NYI: bring me in scope! *)
-
-  let return _ = failwith "NYI: bring me in scope!"
-  let bind _ _ = failwith "NYI: bring me in scope!"
-  let ( >>= ) _ _ = failwith "NYI: bring me in scope!"
-  let ( let* ) _ _ = failwith "NYI: bring me in scope!"
-  let get _ = failwith "NYI: bring me in scope!"
-  let run _ = failwith "NYI: bring me in scope!"
 end

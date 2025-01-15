@@ -32,17 +32,25 @@ module State = struct
 
   (* TODO: should use an integral representation instead: manipulate 'balance * 100' *)
   let compute_interest balance = int_of_float (float_of_int balance *. 1.1)
-  let rec act balance = failwith "NYI"
+  let rec act balance = function
+    | Deposit (i, t) -> act (balance + i) t
+    | Withdraw (i, t) -> act (balance - i) t
+    | ApplyInterest t -> act (compute_interest balance) t
+    | EndOfTransaction -> balance
 end
 
 open Transaction
 
-let ( let* ) _ _ = failwith "NYI: bring me in scope!"
+module Upd = Update.Make(Transaction)(State)
+
+open Upd
+(*let ( let* ) _ _ = failwith "NYI: bring me in scope!"
 let get _ = failwith "NYI: bring me in scope!"
-let run _ = failwith "NYI: bring me in scope!"
-let deposit s = failwith "NYI"
-let withdraw s = failwith "NYI"
-let apply_interest () = failwith "NYI"
+let run _ = failwith "NYI: bring me in scope!"*)
+
+let deposit s = set (Deposit (s, EndOfTransaction))
+let withdraw s = set (Withdraw (s, EndOfTransaction))
+let apply_interest () = set (ApplyInterest EndOfTransaction)
 
 let use_ATM () =
   let* _ = deposit 20 in

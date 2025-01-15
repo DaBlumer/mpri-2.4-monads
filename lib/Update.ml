@@ -11,14 +11,17 @@ module Make (P : Monoid) (S : MonoidAction with type m = P.t) = struct
 
     type 'a t = S.t -> P.t * 'a
 
-    let return a = failwith "NYI"
-    let bind m f = failwith "NYI"
+    let return a = fun _ -> (empty, a)
+    let bind (m : 'a t) (f : 'a -> 'b t) : 'b t = fun (s : S.t) ->
+      let (x, a) = m s in
+      let (x', b) = (f a) (act s x) in
+      (x <+> x', b)
   end
 
   module M = Monad.Expand (Base)
   include M
 
-  let get () = failwith "NYI"
-  let set p = failwith "NYI"
-  let run m = failwith "NYI"
+  let get () : S.t t = fun s -> (P.empty, s)
+  let set p = fun s -> (p, ())
+  let run m = m
 end

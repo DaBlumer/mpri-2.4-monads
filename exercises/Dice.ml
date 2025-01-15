@@ -23,7 +23,7 @@ module E1 = Example (MonteCarlo)
 
 let%test _ =
   let r = MonteCarlo.run E1.roll_3d6 in
-  failwith "NYI: write a meaningful test here"
+  r = 6
 
 module E2 = Example (Distribution)
 
@@ -33,10 +33,14 @@ let ( =~ ) p1 p2 =
 
 let%test _ =
   let r = Distribution.run E2.roll_3d6 in
-  failwith "NYI: write a meaningful test here"
+  let avg = List.fold_left
+    (fun acc (i, f) -> acc +. (float_of_int i *. f))
+    0.0 r
+  in
+  avg =~ 10.5
 
 module E3 = Example (Expectation)
 
 let%test _ =
   let r = Expectation.run E3.roll_3d6 in
-  failwith "NYI: write a meaningful test here"
+  (r float_of_int) =~ 10.5

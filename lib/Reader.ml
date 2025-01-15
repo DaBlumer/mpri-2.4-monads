@@ -9,14 +9,14 @@ struct
   module Base = struct
     type 'a t = Env.t -> 'a
 
-    let return a = failwith "NYI"
-    let bind m f = failwith "NYI"
+    let return a = fun _ -> a
+    let bind (m : 'a t) (f : 'a -> 'b t) : 'b t = fun env -> f (m env) env
   end
 
   module M = Monad.Expand (Base)
   include M
 
-  let get () = failwith "NYI"
-  let local e m = failwith "NYI"
-  let run m = failwith "NYI"
+  let get () = fun env -> env
+  let local (e : Env.t) (m : 'a t) = fun _ -> m e
+  let run m = m
 end

@@ -14,13 +14,15 @@ struct
   module Base = struct
     type 'a t = Log.t * 'a
 
-    let return a = failwith "NYI"
-    let bind m f = failwith "NYI"
+    let return a = (empty, a)
+    let bind (log, a) f =
+      let (log', b) = f a in
+      (log <+> log', b)
   end
 
   module M = Monad.Expand (Base)
   include M
 
-  let set l = failwith "NYI"
-  let run m = failwith "NYI"
+  let set l = (l, ())
+  let run m = m
 end

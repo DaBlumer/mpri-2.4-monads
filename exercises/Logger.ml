@@ -6,8 +6,23 @@ open Monads
 
 (* Taken from http://learnyouahaskell.com/for-a-few-monads-more *)
 
-let rec gcdaux a b = failwith "NYI"
-let gcd a b = failwith "replace me with: 'run (gcdaux a b)'"
+module Logger = Writer.Make(struct
+  type t = string list
+  let empty = []
+  let (<+>) = List.append
+end)
+open Logger
+
+let step_log a b =
+  (string_of_int a) ^ " mod " ^ (string_of_int b) ^ " = " ^ (string_of_int (a mod b))
+
+let rec gcdaux a b =
+  if b = 0 then
+    let* _ = set ["Finished with "^(string_of_int a)] in return a
+  else
+    let* _ = set [step_log a b] in
+    gcdaux b (a mod b)
+let gcd a b = run (gcdaux a b)
 
 let%test _ =
   let x, r = gcd 100 24 in

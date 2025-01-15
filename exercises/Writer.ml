@@ -4,14 +4,19 @@ open Monoid
 module Make (Log : Monoid) = struct
   (* Use the Update monad to instantiate the following definitions *)
 
-  type 'a t = |
+  module UnitS = struct
+    type t = unit
+    type m = Log.t
+    let act _ _ = ()
+  end
+  module Writer = Update.Make(Log)(UnitS)
 
-  (* NYI: bring me in scope! *)
+  type 'a t = 'a Writer.t
 
-  let return _ = failwith "NYI: bring me in scope!"
-  let bind _ _ = failwith "NYI: bring me in scope!"
-  let ( >>= ) _ _ = failwith "NYI: bring me in scope!"
-  let ( let* ) _ _ = failwith "NYI: bring me in scope!"
-  let set _ = failwith "NYI: bring me in scope!"
-  let run _ = failwith "NYI: bring me in scope!"
+  let return = Writer.return
+  let bind = Writer.bind
+  let ( >>= ) = Writer.( >>= )
+  let ( let* ) = Writer.( let* )
+  let set = Writer.set
+  let run x = Writer.run x ()
 end
